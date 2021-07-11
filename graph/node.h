@@ -45,14 +45,12 @@ public:
     template<size_t I>
     void set_input(IN_Edge<I> edge) {
         std::get<I>(m_inputs) = edge;
-        // m_input_edges.emplace_back(edge);
         edge->set_out_node(this, m_name);
     }
 
     template<size_t I>
     void set_output(OUT_Edge<I> edge) {
         std::get<I>(m_outputs) = edge;
-        // m_output_edges.emplace_back(edge);
         edge->set_in_node(this, m_name);
     }
 
@@ -62,8 +60,6 @@ protected:
     std::string m_name;
     typename IN::EdgePtrTypes m_inputs;
     typename OUT::EdgePtrTypes m_outputs;
-    // std::vector<BaseEdge*> m_input_edges;
-    // std::vector<BaseEdge*> m_output_edges;
 };
 
 }

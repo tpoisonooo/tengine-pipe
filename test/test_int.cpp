@@ -11,7 +11,7 @@ int main() {
     auto forward = g.add_node<ForwardInt>();
     auto print = g.add_node<PrintInt>();
 
-    auto gen_for = g.add_edge<FIFOEdge<int>>(100);
+    auto gen_for = g.add_edge<FIFOEdge<std::tuple<int, int>>>(100);
     auto for_print = g.add_edge<FIFOEdge<int>>(100);
 
     gen->set_output<0>(gen_for);

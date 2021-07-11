@@ -3,15 +3,15 @@
 
 namespace pipe{
 
-class ForwardInt: public Node<Param<int>, Param<int>> {
+class ForwardInt: public Node<Param<std::tuple<int, int>>, Param<int>> {
 public:
     ForwardInt() = default;
     
     void exec() override {
-        int val;
+        std::tuple<int, int> val;
         if (input<0>()->pop(val)) {
-            fprintf(stdout, "foward %d\n", val);
-            output<0>()->try_push(val);
+            fprintf(stdout, "foward %d\n", std::get<0>(val));
+            output<0>()->try_push(std::get<0>(val));
         }
     }
 };
