@@ -10,8 +10,6 @@ template <typename... Args>
 class Param {
 public:
     using DataTypes = std::tuple<Args...>;
-    // using DataPtrTypes = std::tuple<Args*...>;
-    // using EdgeTypes = std::tuple<FIFOEdge<Args>...>;
     using EdgePtrTypes = std::tuple<FIFOEdge<Args>*...>;
 };
 
@@ -19,7 +17,10 @@ class BaseNode {
 public:
     BaseNode() = default;
     virtual ~BaseNode() {}
-    virtual void exec() {};
+    virtual void exec() {
+        fprintf(stderr, "do not exec this function!\n");
+        assert(0);
+    };
 };
 
 template<typename IN, typename OUT>
@@ -38,7 +39,7 @@ public:
     }
 
     template<size_t I>
-    inline OUT_Edge<I> output() {
+    OUT_Edge<I> output() {
         return std::get<I>(m_outputs);
     }
 
