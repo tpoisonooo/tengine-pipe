@@ -1,3 +1,4 @@
 *.o
 test_int
+test_camera_display
 .vscode/
