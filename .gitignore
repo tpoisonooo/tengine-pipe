@@ -4,3 +4,4 @@ test_camera_display
 test_preview_ped
 .vscode/
 mobilenet_ssd.tmfile
+libtengine-lite.so

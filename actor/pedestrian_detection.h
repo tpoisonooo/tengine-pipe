@@ -6,7 +6,6 @@
 #include <memory>
 #include <cstdio>
 #include <sys/time.h>
-#include "common/tengine_operations.h"
 
 namespace pipe{
 
@@ -34,7 +33,7 @@ public:
 
         /* set runtime options */
         struct options opt;
-        opt.num_thread = 4;
+        opt.num_thread = 1;
         opt.cluster = TENGINE_CLUSTER_ALL;
         opt.precision = TENGINE_MODE_FP32;
         opt.affinity = 0;
@@ -144,9 +143,6 @@ public:
         cv::cvtColor(input, input, CV_BGR2RGB);
         input.convertTo(input, CV_32FC3);
 
-        image resImg = make_empty_image(img_w, img_h, 3);
-        resImg.data = m_input_data.get();
-
 
         float* img_data = (float* )input.data;
         /* nhwc to nchw */
@@ -157,7 +153,7 @@ public:
                 {
                     int in_index  = h * img_w * 3 + w * 3 + c;
                     int out_index = c * img_h * img_w + h * img_w + w;
-                    resImg.data[out_index] = (img_data[in_index] - mean[c]) * scale[c];
+                    m_input_data.get()[out_index] = (img_data[in_index] - mean[c]) * scale[c];
                 }
             }
         }
