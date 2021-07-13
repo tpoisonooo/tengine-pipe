@@ -1,16 +1,16 @@
 #pragma once
 #include "../graph/node.h"
 
-namespace pipe{
+namespace pipe {
 
-class PrintInt: public Node<Param<int>, Param<void>> {
+class PrintInt : public Node<Param<int>, Param<void>> {
 public:
-    void exec() override {
-        int val;
-        if (input<0>()->pop(val)) {
-            fprintf(stdout, "fetch %d\n", val);
-        }
+  void exec() override {
+    int val;
+    if (input<0>()->pop(val)) {
+      fprintf(stdout, "fetch %d\n", val);
     }
+  }
 };
 
-}
+} // namespace pipe

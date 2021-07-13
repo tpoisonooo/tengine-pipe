@@ -25,9 +25,8 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <stddef.h>
-
+#include <stdint.h>
 
 #if defined __GNUC__
 #define DLLEXPORT __attribute((visibility("default")))
@@ -37,10 +36,9 @@
 #define DLLEXPORT
 #endif
 
-
 #if defined __GNUC__
 #define DEPRECATED_BEFORE
-#define DEPRECATED_AFTER  __attribute__ ((deprecated))
+#define DEPRECATED_AFTER __attribute__((deprecated))
 #elif defined(_MSC_VER)
 #pragma deprecated()
 #define DEPRECATED_BEFORE __declspec(deprecated)
@@ -50,277 +48,274 @@
 #define DEPRECATED_AFTER
 #endif
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define MAX_SHAPE_DIM_NUM           8
+#define MAX_SHAPE_DIM_NUM 8
 
 /* the data type of the tensor */
-#define TENGINE_DT_FP32             0
-#define TENGINE_DT_FP16             1
-#define TENGINE_DT_INT8             2
-#define TENGINE_DT_UINT8            3
-#define TENGINE_DT_INT32            4
-#define TENGINE_DT_INT16            5
+#define TENGINE_DT_FP32 0
+#define TENGINE_DT_FP16 1
+#define TENGINE_DT_INT8 2
+#define TENGINE_DT_UINT8 3
+#define TENGINE_DT_INT32 4
+#define TENGINE_DT_INT16 5
 
 /* layout type, not real layout */
-#define TENGINE_LAYOUT_NCHW         0
-#define TENGINE_LAYOUT_NHWC         1
+#define TENGINE_LAYOUT_NCHW 0
+#define TENGINE_LAYOUT_NHWC 1
 
 /* tensor type: the content changed or not during inference */
-#define TENSOR_TYPE_UNKNOWN         0
-#define TENSOR_TYPE_VAR             1
-#define TENSOR_TYPE_CONST           2
-#define TENSOR_TYPE_INPUT           3
-#define TENSOR_TYPE_DEP             4
+#define TENSOR_TYPE_UNKNOWN 0
+#define TENSOR_TYPE_VAR 1
+#define TENSOR_TYPE_CONST 2
+#define TENSOR_TYPE_INPUT 3
+#define TENSOR_TYPE_DEP 4
 
 /* cluster type: big-LITTLE and DynamIQ defined */
-#define TENGINE_CLUSTER_ALL         0
-#define TENGINE_CLUSTER_BIG         1
-#define TENGINE_CLUSTER_MEDIUM      2
-#define TENGINE_CLUSTER_LITTLE      3
+#define TENGINE_CLUSTER_ALL 0
+#define TENGINE_CLUSTER_BIG 1
+#define TENGINE_CLUSTER_MEDIUM 2
+#define TENGINE_CLUSTER_LITTLE 3
 
-#define TENGINE_MODE_FP32           0
-#define TENGINE_MODE_FP16           1
-#define TENGINE_MODE_HYBRID_INT8    2
-#define TENGINE_MODE_UINT8          3
-#define TENGINE_MODE_INT8           4
+#define TENGINE_MODE_FP32 0
+#define TENGINE_MODE_FP16 1
+#define TENGINE_MODE_HYBRID_INT8 2
+#define TENGINE_MODE_UINT8 3
+#define TENGINE_MODE_INT8 4
 
 /* node dump action definition */
-#define NODE_DUMP_ACTION_DISABLE    0
-#define NODE_DUMP_ACTION_ENABLE     1
-#define NODE_DUMP_ACTION_START      2
-#define NODE_DUMP_ACTION_STOP       3
-#define NODE_DUMP_ACTION_GET        4
+#define NODE_DUMP_ACTION_DISABLE 0
+#define NODE_DUMP_ACTION_ENABLE 1
+#define NODE_DUMP_ACTION_START 2
+#define NODE_DUMP_ACTION_STOP 3
+#define NODE_DUMP_ACTION_GET 4
 
 /* graph perf action definition */
-#define GRAPH_PERF_STAT_DISABLE     0
-#define GRAPH_PERF_STAT_ENABLE      1
-#define GRAPH_PERF_STAT_STOP        2
-#define GRAPH_PERF_STAT_START       3
-#define GRAPH_PERF_STAT_RESET       4
-#define GRAPH_PERF_STAT_GET         5
-
+#define GRAPH_PERF_STAT_DISABLE 0
+#define GRAPH_PERF_STAT_ENABLE 1
+#define GRAPH_PERF_STAT_STOP 2
+#define GRAPH_PERF_STAT_START 3
+#define GRAPH_PERF_STAT_RESET 4
+#define GRAPH_PERF_STAT_GET 5
 
 /* follow the std. UNIX log level definition */
-enum log_level
-{
-    LOG_EMERG,
-    LOG_ALERT,
-    LOG_CRIT,
-    LOG_ERR,
-    LOG_WARNING,
-    LOG_NOTICE,
-    LOG_INFO,
-    LOG_DEBUG
+enum log_level {
+  LOG_EMERG,
+  LOG_ALERT,
+  LOG_CRIT,
+  LOG_ERR,
+  LOG_WARNING,
+  LOG_NOTICE,
+  LOG_INFO,
+  LOG_DEBUG
 };
-
 
 /* note: Android NN only define one event */
-enum graph_exec_event
-{
-    GRAPH_EXEC_START,
-    GRAPH_EXEC_SUSPEND,
-    GRAPH_EXEC_RESUME,
-    GRAPH_EXEC_ABORT,
-    GRAPH_EXEC_DONE
+enum graph_exec_event {
+  GRAPH_EXEC_START,
+  GRAPH_EXEC_SUSPEND,
+  GRAPH_EXEC_RESUME,
+  GRAPH_EXEC_ABORT,
+  GRAPH_EXEC_DONE
 };
-
 
 /* TODO: should add suspend? */
-enum graph_exec_stat
-{
-    GRAPH_STAT_CREATED,
-    GRAPH_STAT_READY,
-    GRAPH_STAT_RUNNING,
-    GRAPH_STAT_DONE,
-    GRAPH_STAT_ERROR
+enum graph_exec_stat {
+  GRAPH_STAT_CREATED,
+  GRAPH_STAT_READY,
+  GRAPH_STAT_RUNNING,
+  GRAPH_STAT_DONE,
+  GRAPH_STAT_ERROR
 };
 
+enum device_policy { DEFAULT_POLICY, LATENCY_POLICY, LOW_POWER_POLICY };
 
-enum device_policy
-{
-    DEFAULT_POLICY,
-    LATENCY_POLICY,
-    LOW_POWER_POLICY
-};
+typedef void *context_t;
+typedef void *graph_t;
+typedef void *tensor_t;
+typedef void *node_t;
 
+typedef int (*event_handler_t)(graph_t, int, void *arg);
 
-typedef void* context_t;
-typedef void* graph_t;
-typedef void* tensor_t;
-typedef void* node_t;
-
-
-typedef int (*event_handler_t)(graph_t, int, void* arg);
-
-
-typedef void (*log_print_t)(const char*);
-
+typedef void (*log_print_t)(const char *);
 
 /* graph exec options */
-typedef struct options
-{
-    int num_thread;
-    int cluster;
-    int precision;
-    uint64_t affinity;
+typedef struct options {
+  int num_thread;
+  int cluster;
+  int precision;
+  uint64_t affinity;
 } options_t;
 
+struct custom_kernel_tensor {
+  int dim[MAX_SHAPE_DIM_NUM]; /* the shape dim array */
+  int dim_num;                /* valid entry number */
+  int element_num;
+  int element_size; /* determined  by data_type */
+  int data_type;
+  int dev_type;    /* indicate the tensor belongs to CPU/GPU ... */
+  int layout_type; /*  NCHW type or NHWC type*/
 
-struct custom_kernel_tensor
-{
-    int dim[MAX_SHAPE_DIM_NUM]; /* the shape dim array */
-    int dim_num; /* valid entry number */
-    int element_num;
-    int element_size; /* determined  by data_type */
-    int data_type;
-    int dev_type; /* indicate the tensor belongs to CPU/GPU ... */
-    int layout_type; /*  NCHW type or NHWC type*/
+  /* quant info */
+  int quant_type; /* int8, int16 or int32 */
+  float *scale;
+  int *zero_point;
+  int *quant_number;
 
-    /* quant info */
-    int quant_type; /* int8, int16 or int32 */
-    float* scale;
-    int* zero_point;
-    int* quant_number;
-
-    void* data; /* pointer to host memory (virtual address) */
-    void* dev_mem; /* refers to device memory block */
-    void* mapped_mem; /* the mapped address for device memory block */
+  void *data;       /* pointer to host memory (virtual address) */
+  void *dev_mem;    /* refers to device memory block */
+  void *mapped_mem; /* the mapped address for device memory block */
 };
-
 
 /* For user to add user defined kernel*/
-struct custom_kernel_ops
-{
-    const char* kernel_name; /* name of the kernel */
-    const char* op; /* name of the op to be implemented */
-    int force; /* if not set, when bind() failed,
-      try to use other kernel implementations*/
-    void* kernel_param; /* used for kernel impl functions */
-    int kernel_param_size;
+struct custom_kernel_ops {
+  const char *kernel_name; /* name of the kernel */
+  const char *op;          /* name of the op to be implemented */
+  int force;               /* if not set, when bind() failed,
+                  try to use other kernel implementations*/
+  void *kernel_param;      /* used for kernel impl functions */
+  int kernel_param_size;
 
-    /*!
-     * @brief generate output shape according to input shapes
-     *        if not implemented, set it to NULL.
-     *
-     * @param [in]  ops: The point of custom defined kernel.
-     * @param [in]  inputs[]:  pointer array to the shape of input tensors.
-     *                         the shape has MAX_SHAPE_DIM_NUM elements,
-     *                         and element with value 0  means the end of the shape.
-     * @param [in]  input_num: The number of input tensors.
-     * @param [out] outputs[]: pointer array to the shape of output tensors.
-     *                         the memory has been allocated already
-     * @param [in]  output_num: The number of output tensors
-     * @param [in]  layout: the graph layout is NHWC or NCHW
-     *
-     * @return 0: success, -1: fail.
-     */
-    int (*infer_shape)(struct custom_kernel_ops* ops, const int* inputs[], int input_num, int* outputs[],
-                       int output_num, int layout);
+  /*!
+   * @brief generate output shape according to input shapes
+   *        if not implemented, set it to NULL.
+   *
+   * @param [in]  ops: The point of custom defined kernel.
+   * @param [in]  inputs[]:  pointer array to the shape of input tensors.
+   *                         the shape has MAX_SHAPE_DIM_NUM elements,
+   *                         and element with value 0  means the end of the
+   * shape.
+   * @param [in]  input_num: The number of input tensors.
+   * @param [out] outputs[]: pointer array to the shape of output tensors.
+   *                         the memory has been allocated already
+   * @param [in]  output_num: The number of output tensors
+   * @param [in]  layout: the graph layout is NHWC or NCHW
+   *
+   * @return 0: success, -1: fail.
+   */
+  int (*infer_shape)(struct custom_kernel_ops *ops, const int *inputs[],
+                     int input_num, int *outputs[], int output_num, int layout);
 
-    /*!
-     * @brief Get the inplace input tensor index for an output tensor.
-     *
-     * @param [in] ops: The point of custom defined kernel.
-     * @param [in] output_idx: The index of custom defined kernel output.
-     *
-     * @return the inplace input tensor index for an output tensor.
-     *         if the output tensor is not an inplace one, return -1.
-     */
-    int (*inplace_info)(struct custom_kernel_ops* ops, int output_idx);    // optional
+  /*!
+   * @brief Get the inplace input tensor index for an output tensor.
+   *
+   * @param [in] ops: The point of custom defined kernel.
+   * @param [in] output_idx: The index of custom defined kernel output.
+   *
+   * @return the inplace input tensor index for an output tensor.
+   *         if the output tensor is not an inplace one, return -1.
+   */
+  int (*inplace_info)(struct custom_kernel_ops *ops,
+                      int output_idx); // optional
 
-    /*!
-     * @brief Check if the kernel can work on the input and output shapes.
-     *
-     * @param [in] ops: The point of custom defined kernel.
-     * @param [in] inputs[]: The custom kernel tensors for input.
-     * @param [in] input_num: The number of the input tensors.
-     * @param [in] outputs[]: The custom kernel output tensor for output
-     * @param [in] output_num: The number of the output tensors.
-     *
-     * @return 0 if the input and output are supported
-     *         otherwise, return -1.
-     *
-     * notes: If not implemented, set it NULL, which means always return 0.
-     */
-    int (*bind)(struct custom_kernel_ops* ops, const struct custom_kernel_tensor* inputs[], int input_num,
-                const struct custom_kernel_tensor* outputs[], int output_num);
+  /*!
+   * @brief Check if the kernel can work on the input and output shapes.
+   *
+   * @param [in] ops: The point of custom defined kernel.
+   * @param [in] inputs[]: The custom kernel tensors for input.
+   * @param [in] input_num: The number of the input tensors.
+   * @param [in] outputs[]: The custom kernel output tensor for output
+   * @param [in] output_num: The number of the output tensors.
+   *
+   * @return 0 if the input and output are supported
+   *         otherwise, return -1.
+   *
+   * notes: If not implemented, set it NULL, which means always return 0.
+   */
+  int (*bind)(struct custom_kernel_ops *ops,
+              const struct custom_kernel_tensor *inputs[], int input_num,
+              const struct custom_kernel_tensor *outputs[], int output_num);
 
-    /*!
-     * @brief Prepare for run graph.
-     *        dynamic_shape means it is not an abnormal case when input_num is zero.
-     *
-     * @param [in] ops: The point of custom defined kernel.
-     * @param [in] inputs[]: The custom defined kernel input tensor.
-     * @param [in] input_num: The number of the custom defined kernel input tensor.
-     * @param [in] outputs[]: The custom defined kernel output tensor.
-     * @param [in] output_num: The number of the custom defined kernel output tensor.
-     * @param [in] dynamic_shape: It is not an abnormal case when input_num is zero.
+  /*!
+   * @brief Prepare for run graph.
+   *        dynamic_shape means it is not an abnormal case when input_num is
+   zero.
+   *
+   * @param [in] ops: The point of custom defined kernel.
+   * @param [in] inputs[]: The custom defined kernel input tensor.
+   * @param [in] input_num: The number of the custom defined kernel input
+   tensor.
+   * @param [in] outputs[]: The custom defined kernel output tensor.
+   * @param [in] output_num: The number of the custom defined kernel output
+   tensor.
+   * @param [in] dynamic_shape: It is not an abnormal case when input_num is
+   zero.
 
-     * @return 0: success, -1: fail.
-     */
-    int (*prerun)(struct custom_kernel_ops* ops, struct custom_kernel_tensor* inputs[], int input_num,
-                  struct custom_kernel_tensor* outputs[], int output_num, int dynamic_shape);
+   * @return 0: success, -1: fail.
+   */
+  int (*prerun)(struct custom_kernel_ops *ops,
+                struct custom_kernel_tensor *inputs[], int input_num,
+                struct custom_kernel_tensor *outputs[], int output_num,
+                int dynamic_shape);
 
-    /*!
-     * @brief Reshape the graph.
-     *
-     * @param [in] ops: The point of custom defined kernel.
-     * @param [in] inputs[]: The custom defined kernel input tensor.
-     * @param [in] input_num: The number of the custom defined kernel input tensor.
-     * @param [in] outputs[]: The custom defined kernel output tensor.
-     * @param [in] output_num: The number of the custom defined kernel output tensor.
+  /*!
+   * @brief Reshape the graph.
+   *
+   * @param [in] ops: The point of custom defined kernel.
+   * @param [in] inputs[]: The custom defined kernel input tensor.
+   * @param [in] input_num: The number of the custom defined kernel input
+   tensor.
+   * @param [in] outputs[]: The custom defined kernel output tensor.
+   * @param [in] output_num: The number of the custom defined kernel output
+   tensor.
 
-     * @return 0: success, -1: fail.
-     *
-     * notes: It will be called, when input shape changed.
-     *        After prerun() has been called, need to reclaim and re-allocate run-time
-     *        resource depends on input shape.
-     */
-    int (*reshape)(struct custom_kernel_ops* ops, struct custom_kernel_tensor* inputs[], int input_num,
-                   struct custom_kernel_tensor* outputs[], int output_num);
+   * @return 0: success, -1: fail.
+   *
+   * notes: It will be called, when input shape changed.
+   *        After prerun() has been called, need to reclaim and re-allocate
+   run-time
+   *        resource depends on input shape.
+   */
+  int (*reshape)(struct custom_kernel_ops *ops,
+                 struct custom_kernel_tensor *inputs[], int input_num,
+                 struct custom_kernel_tensor *outputs[], int output_num);
 
-    /*!
-     * @brief Run the graph.
-     *
-     * @param [in] ops: The point of custom defined kernel.
-     * @param [in] inputs[]: The custom defined kernel input tensor.
-     * @param [in] input_num: The number of the custom defined kernel input tensor.
-     * @param [in] outputs[]: The custom defined kernel output tensor.
-     * @param [in] output_num: The number of the custom defined kernel output tensor.
+  /*!
+   * @brief Run the graph.
+   *
+   * @param [in] ops: The point of custom defined kernel.
+   * @param [in] inputs[]: The custom defined kernel input tensor.
+   * @param [in] input_num: The number of the custom defined kernel input
+   tensor.
+   * @param [in] outputs[]: The custom defined kernel output tensor.
+   * @param [in] output_num: The number of the custom defined kernel output
+   tensor.
 
-     * @return 0: success, -1: fail.
-     */
-    int (*run)(struct custom_kernel_ops* ops, struct custom_kernel_tensor* inputs[], int input_num,
-               struct custom_kernel_tensor* outputs[], int output_num);
+   * @return 0: success, -1: fail.
+   */
+  int (*run)(struct custom_kernel_ops *ops,
+             struct custom_kernel_tensor *inputs[], int input_num,
+             struct custom_kernel_tensor *outputs[], int output_num);
 
-    /*!
-     * @brief Pause the graph and release the resources used when the graph is running.
-     *
-     * @param [in] ops: The point of custom defined kernel.
-     * @param [in] inputs[]: The custom defined kernel input tensor.
-     * @param [in] input_num: The number of the custom defined kernel input tensor.
-     * @param [in] outputs[]: The custom defined kernel output tensor.
-     * @param [in] output_num: The number of the custom defined kernel output tensor.
+  /*!
+   * @brief Pause the graph and release the resources used when the graph is
+   running.
+   *
+   * @param [in] ops: The point of custom defined kernel.
+   * @param [in] inputs[]: The custom defined kernel input tensor.
+   * @param [in] input_num: The number of the custom defined kernel input
+   tensor.
+   * @param [in] outputs[]: The custom defined kernel output tensor.
+   * @param [in] output_num: The number of the custom defined kernel output
+   tensor.
 
-     * @return 0: success, -1: fail.
-     */
-    int (*postrun)(struct custom_kernel_ops* ops, struct custom_kernel_tensor* inputs[], int input_num,
-                   struct custom_kernel_tensor* outputs[], int output_num);
+   * @return 0: success, -1: fail.
+   */
+  int (*postrun)(struct custom_kernel_ops *ops,
+                 struct custom_kernel_tensor *inputs[], int input_num,
+                 struct custom_kernel_tensor *outputs[], int output_num);
 
-    /*!
-     * @brief Free the resource allocated this ops implementation.
-     *
-     * @param [in] ops: The point of custom defined kernel.
-     *
-     * @return None.
-     */
-    void (*release)(struct custom_kernel_ops* ops);
+  /*!
+   * @brief Free the resource allocated this ops implementation.
+   *
+   * @param [in] ops: The point of custom defined kernel.
+   *
+   * @return None.
+   */
+  void (*release)(struct custom_kernel_ops *ops);
 };
-
 
 /************** Library intialization and version checking *******************/
 
@@ -343,21 +338,21 @@ DLLEXPORT void release_tengine(void);
  *
  * @return const char * of version string.
  */
-DLLEXPORT const char* get_tengine_version(void);
+DLLEXPORT const char *get_tengine_version(void);
 
 /*!
  * @brief Check the run-time library supports the verson.
- *        app developer should call get_tengine_version() to save the version used
- *        during developping.
+ *        app developer should call get_tengine_version() to save the version
+ * used during developping.
  *
  *        this interface is designed for app built with dynamic tengine library.
- *        The app knows exactly that it can work on a tengine version, and it can
- *        check run-time tengine library supports that version.
+ *        The app knows exactly that it can work on a tengine version, and it
+ * can check run-time tengine library supports that version.
  *
  * @param [in] version: A c string returned by get_tengine_version()
  * @return 1: support, 0: not support.
  */
-DLLEXPORT int request_tengine_version(const char* version);
+DLLEXPORT int request_tengine_version(const char *version);
 
 /*************************** graph operate set ********************************/
 
@@ -366,7 +361,8 @@ DLLEXPORT int request_tengine_version(const char* version);
  *        If model format is NULL, an empty graph handle will be returned.
  *
  * @param [in] context: The context the graph will run inside;
- *                   could be NULL and the graph is created in a private context.
+ *                   could be NULL and the graph is created in a private
+ * context.
  *
  * @param [in] model_format: The model format type,such as "caffe","tengine"
  * @param [in] file_name:  The name of model file.
@@ -374,7 +370,8 @@ DLLEXPORT int request_tengine_version(const char* version);
  * @return  The graph handler or NULL if failed.
  */
 
-DLLEXPORT graph_t create_graph(context_t context, const char* model_format, const char* file_name, ...);
+DLLEXPORT graph_t create_graph(context_t context, const char *model_format,
+                               const char *file_name, ...);
 
 /*!
  * @brief Set the layout type of the graph
@@ -396,7 +393,8 @@ DLLEXPORT int set_graph_layout(graph_t graph, int layout_type);
  *
  * @note  if using the default input nodes of a graph, this call can be skipped
  */
-DLLEXPORT int set_graph_input_node(graph_t graph, const char* input_nodes[], int input_number);
+DLLEXPORT int set_graph_input_node(graph_t graph, const char *input_nodes[],
+                                   int input_number);
 
 /*!
  * @brief designate the output nodes of the graph
@@ -408,7 +406,8 @@ DLLEXPORT int set_graph_input_node(graph_t graph, const char* input_nodes[], int
  * @note  if using the default output nodes of a graph, this call can be skipped
  */
 
-DLLEXPORT int set_graph_output_node(graph_t graph, const char* output_nodes[], int output_number);
+DLLEXPORT int set_graph_output_node(graph_t graph, const char *output_nodes[],
+                                    int output_number);
 
 /*!
  * @brief Destory the runtime graph and release allocated resource.
@@ -465,18 +464,21 @@ DLLEXPORT node_t get_graph_output_node(graph_t graph, int idx);
  * @return The tensor handle or NULL on error.
  *
  */
-DLLEXPORT tensor_t get_graph_output_tensor(graph_t graph, int output_node_idx, int tensor_idx);
+DLLEXPORT tensor_t get_graph_output_tensor(graph_t graph, int output_node_idx,
+                                           int tensor_idx);
 
 /*!
  * @brief Get tensor handle of one graph input tensor.
  *
  * @param [in] graph: The graph handle.
  * @param [in] input_node_idx: The input node index, starting from zero.
- * @param [in] tensor_idx: The output tensor index of the input node, starting from zero.
+ * @param [in] tensor_idx: The output tensor index of the input node, starting
+ * from zero.
  *
  * @return The tensor handle or NULL on error.
  */
-DLLEXPORT tensor_t get_graph_input_tensor(graph_t graph, int input_node_idx, int tensor_idx);
+DLLEXPORT tensor_t get_graph_input_tensor(graph_t graph, int input_node_idx,
+                                          int tensor_idx);
 
 /******************* node operate set ****************************/
 /*!
@@ -488,7 +490,8 @@ DLLEXPORT tensor_t get_graph_input_tensor(graph_t graph, int input_node_idx, int
  *
  * @return The node handle or NULL on error.
  */
-DLLEXPORT node_t create_graph_node(graph_t graph, const char* node_name, const char* op_name);
+DLLEXPORT node_t create_graph_node(graph_t graph, const char *node_name,
+                                   const char *op_name);
 
 /*!
  * @brief  Get the node handle of the graph.
@@ -498,7 +501,7 @@ DLLEXPORT node_t create_graph_node(graph_t graph, const char* node_name, const c
  *
  * @return The node handle or NULL on error.
  */
-DLLEXPORT node_t get_graph_node(graph_t graph, const char* node_name);
+DLLEXPORT node_t get_graph_node(graph_t graph, const char *node_name);
 
 /*!
  * @brief  Get the node handle of the graph.
@@ -526,7 +529,7 @@ DLLEXPORT int get_graph_node_num(graph_t graph);
  *
  * @return The node name, NULL on error.
  */
-DLLEXPORT const char* get_node_name(node_t node);
+DLLEXPORT const char *get_node_name(node_t node);
 
 /*!
  * @brief Get the node op.
@@ -535,7 +538,7 @@ DLLEXPORT const char* get_node_name(node_t node);
  *
  * @return The op name, NULL on error.
  */
-DLLEXPORT const char* get_node_op(node_t node);
+DLLEXPORT const char *get_node_op(node_t node);
 
 /*!
  * @brief  Release the node handle.
@@ -578,7 +581,8 @@ DLLEXPORT tensor_t get_node_output_tensor(node_t node, int output_idx);
  * @return 0 on success or -1 on error.
  *
  */
-DLLEXPORT int set_node_input_tensor(node_t node, int input_idx, tensor_t tensor);
+DLLEXPORT int set_node_input_tensor(node_t node, int input_idx,
+                                    tensor_t tensor);
 
 /*!
  * @brief Set a node's the #idx output tensor.
@@ -591,7 +595,8 @@ DLLEXPORT int set_node_input_tensor(node_t node, int input_idx, tensor_t tensor)
  *  @return 0 on success or -1 on error.
  *
  */
-DLLEXPORT int set_node_output_tensor(node_t node, int output_idx, tensor_t tensor, int tensor_type);
+DLLEXPORT int set_node_output_tensor(node_t node, int output_idx,
+                                     tensor_t tensor, int tensor_type);
 
 /*!
  * @brief Get the output tensor number of a node.
@@ -629,7 +634,8 @@ DLLEXPORT int get_node_input_number(node_t node);
  * @return 0: Successfully,
  *         -1: Failed.
  */
-DLLEXPORT int add_node_attr(node_t node, const char* attr_name, const char* type_name, int size);
+DLLEXPORT int add_node_attr(node_t node, const char *attr_name,
+                            const char *type_name, int size);
 
 /*!
  * @brief Get the attribute value (int) of a node
@@ -643,7 +649,9 @@ DLLEXPORT int add_node_attr(node_t node, const char* attr_name, const char* type
  *         -1: Failed, the name does not exist or the type mismatch.
  *
  */
-DLLEXPORT DEPRECATED_BEFORE int get_node_attr_int(node_t node, const char* attr_name, int* attr_val) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+get_node_attr_int(node_t node, const char *attr_name,
+                  int *attr_val) DEPRECATED_AFTER;
 
 /*!
  * @brief Get the attribute value (float) of a node
@@ -656,7 +664,9 @@ DLLEXPORT DEPRECATED_BEFORE int get_node_attr_int(node_t node, const char* attr_
  * @return 0: Retrieval value Successfully,
  *         -1: Failed, the name does not exist or the type mismatch.
  */
-DLLEXPORT DEPRECATED_BEFORE int get_node_attr_float(node_t node, const char* attr_name, float* attr_val) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+get_node_attr_float(node_t node, const char *attr_name,
+                    float *attr_val) DEPRECATED_AFTER;
 
 /*!
  * @brief Get the attribute value (pointer) of a node
@@ -669,10 +679,13 @@ DLLEXPORT DEPRECATED_BEFORE int get_node_attr_float(node_t node, const char* att
  * @return  0: Retrieval value Successfully,
  *         -1: Failed, the name does not exist or the type mismatch.
  */
-DLLEXPORT DEPRECATED_BEFORE int get_node_attr_pointer(node_t node, const char* attr_name, void* attr_val) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+get_node_attr_pointer(node_t node, const char *attr_name,
+                      void *attr_val) DEPRECATED_AFTER;
 
 /*!
- * @brief Get the attribute value of a node, the data type is indicated by type_info.
+ * @brief Get the attribute value of a node, the data type is indicated by
+ * type_info.
  *
  * @param [in] node: The target node.
  * @param [in] attr_name: The name of the attribute to be retrieval.
@@ -685,7 +698,9 @@ DLLEXPORT DEPRECATED_BEFORE int get_node_attr_pointer(node_t node, const char* a
  *         -1: Failed; The name does not exist or the type mismatch.
  *
  */
-DLLEXPORT DEPRECATED_BEFORE int get_node_attr_generic(node_t node, const char* attr_name, const char* type_name, void* buf, int size) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+get_node_attr_generic(node_t node, const char *attr_name, const char *type_name,
+                      void *buf, int size) DEPRECATED_AFTER;
 
 /*!
  * @brief Set the attribute value (int) of a node
@@ -699,7 +714,9 @@ DLLEXPORT DEPRECATED_BEFORE int get_node_attr_generic(node_t node, const char* a
  *         -1: Failed, The name does not exist or the type mismatch.
  *
  */
-DLLEXPORT DEPRECATED_BEFORE int set_node_attr_int(node_t node, const char* attr_name, const int* attr_val) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+set_node_attr_int(node_t node, const char *attr_name,
+                  const int *attr_val) DEPRECATED_AFTER;
 
 /*!
  * @brief Set the attribute value (float) of a node
@@ -713,7 +730,9 @@ DLLEXPORT DEPRECATED_BEFORE int set_node_attr_int(node_t node, const char* attr_
  *         -1: Failed, The name does not exist or the type mismatch.
  *
  */
-DLLEXPORT DEPRECATED_BEFORE int set_node_attr_float(node_t node, const char* attr_name, const float* attr_val) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+set_node_attr_float(node_t node, const char *attr_name,
+                    const float *attr_val) DEPRECATED_AFTER;
 
 /*!
  * @brief Set the attribute value (pointer) of a node
@@ -727,10 +746,13 @@ DLLEXPORT DEPRECATED_BEFORE int set_node_attr_float(node_t node, const char* att
  *         -1: Failed, The name does not exist or the type mismatch.
  *
  */
-DLLEXPORT DEPRECATED_BEFORE int set_node_attr_pointer(node_t node, const char* attr_name, const void* attr_val) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+set_node_attr_pointer(node_t node, const char *attr_name,
+                      const void *attr_val) DEPRECATED_AFTER;
 
 /*!
- * @brief Set the attribute value of a node, the data type is indicated by type_info.
+ * @brief Set the attribute value of a node, the data type is indicated by
+ * type_info.
  *
  * @param [in] node: The target node.
  * @param [in] attr_name: The name of the attribute to be retrieval.
@@ -743,29 +765,36 @@ DLLEXPORT DEPRECATED_BEFORE int set_node_attr_pointer(node_t node, const char* a
  *         -1: Failed, The name does not exist or the type mismatch.
  *
  */
-DLLEXPORT DEPRECATED_BEFORE int set_node_attr_generic(node_t node, const char* attr_name, const char* type_name, const void* buf, int size) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+set_node_attr_generic(node_t node, const char *attr_name, const char *type_name,
+                      const void *buf, int size) DEPRECATED_AFTER;
 
 /*!
  * @brief Set customer kernel of a node, on a specific device,
  *        the operate in kernel_ops must be the same as node's operate.
  *
  * @param [in] node: The node handle.
- * @param [in] device: The kernel works for which device. NULL means for default device.
+ * @param [in] device: The kernel works for which device. NULL means for default
+ * device.
  * @param [in] kernel_ops: The custom implemented kernel operates.
  *
  * @return 0: Success, -1: Fail.
  */
-DLLEXPORT DEPRECATED_BEFORE int set_custom_kernel(node_t node, const char* dev_name, struct custom_kernel_ops* kernel_ops) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+set_custom_kernel(node_t node, const char *dev_name,
+                  struct custom_kernel_ops *kernel_ops) DEPRECATED_AFTER;
 
 /*!
  * @brief Remove customer kernel of a node, on a specific device.
  *
  * @param [in] node: The node handle.
- * @param [in] device: The kernel works for which device. NULL means for default device.
+ * @param [in] device: The kernel works for which device. NULL means for default
+ * device.
  *
  * @return 0: Success, -1: Fail.
  */
-DLLEXPORT DEPRECATED_BEFORE int remove_custom_kernel(node_t node, const char* dev_name) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+remove_custom_kernel(node_t node, const char *dev_name) DEPRECATED_AFTER;
 
 /********************* Tensor operate set ***********************************/
 
@@ -779,7 +808,8 @@ DLLEXPORT DEPRECATED_BEFORE int remove_custom_kernel(node_t node, const char* de
  * @return The tensor handle or NULL on error.
  *
  */
-DLLEXPORT tensor_t create_graph_tensor(graph_t graph, const char* tensor_name, int data_type);
+DLLEXPORT tensor_t create_graph_tensor(graph_t graph, const char *tensor_name,
+                                       int data_type);
 
 /*!
  * @brief Get a tensor handle by tensor name.
@@ -790,7 +820,7 @@ DLLEXPORT tensor_t create_graph_tensor(graph_t graph, const char* tensor_name, i
  * @return The tensor handle or NULL on error.
  *
  */
-DLLEXPORT tensor_t get_graph_tensor(graph_t graph, const char* tensor_name);
+DLLEXPORT tensor_t get_graph_tensor(graph_t graph, const char *tensor_name);
 
 /*!
  * @brief  Get the name of the tensor handle.
@@ -800,7 +830,7 @@ DLLEXPORT tensor_t get_graph_tensor(graph_t graph, const char* tensor_name);
  * @return A c string.
 
  */
-DLLEXPORT const char* get_tensor_name(tensor_t tensor);
+DLLEXPORT const char *get_tensor_name(tensor_t tensor);
 
 /*!
  * @brief Release the tensor handle.
@@ -831,7 +861,8 @@ DLLEXPORT int get_tensor_shape(tensor_t tensor, int dims[], int dim_number);
  * @return 0: Success; -1: Fail.
  *
  */
-DLLEXPORT int set_tensor_shape(tensor_t tensor, const int dims[], int dim_number);
+DLLEXPORT int set_tensor_shape(tensor_t tensor, const int dims[],
+                               int dim_number);
 
 /*!
  * @brief Get the byte size of a tensor should occupy.
@@ -845,13 +876,14 @@ DLLEXPORT int get_tensor_buffer_size(tensor_t tensor);
 
 /*!
  * @brief Get the buffer of the tensor.
- *    A tensor may deny to expose its internal buffer, so that get_tensor_buffer()
- *    will fail but get_tensor_buffer_size()/set_tensor_data() succeed.
+ *    A tensor may deny to expose its internal buffer, so that
+ * get_tensor_buffer() will fail but get_tensor_buffer_size()/set_tensor_data()
+ * succeed.
  *
  * @param [in] tensor: The tensor handle.
  * @return The buffer address. if no buffer allocated return NULL.
  */
-DLLEXPORT void* get_tensor_buffer(tensor_t tensor);
+DLLEXPORT void *get_tensor_buffer(tensor_t tensor);
 
 /*!
  * @brief Set the buffer of the tensor.
@@ -864,7 +896,7 @@ DLLEXPORT void* get_tensor_buffer(tensor_t tensor);
  * @return 0: Success; -1: Fail.
  * @note  The buffer is still managed by caller.
  */
-DLLEXPORT int set_tensor_buffer(tensor_t tensor, void* buffer, int buffer_size);
+DLLEXPORT int set_tensor_buffer(tensor_t tensor, void *buffer, int buffer_size);
 
 /*!
  * @brief Copy tensor data to the output data buffer.
@@ -875,7 +907,8 @@ DLLEXPORT int set_tensor_buffer(tensor_t tensor, void* buffer, int buffer_size);
  * @return 0: Success; or -1: Fail.
  *
  */
-DLLEXPORT int get_tensor_data(tensor_t tensor, void* output_data, int data_size);
+DLLEXPORT int get_tensor_data(tensor_t tensor, void *output_data,
+                              int data_size);
 
 /*!
  * @brief Copy the data to tensor buffer.
@@ -887,7 +920,8 @@ DLLEXPORT int get_tensor_data(tensor_t tensor, void* output_data, int data_size)
  * @return 0: Success; -1: Fail.
  *
  */
-DLLEXPORT int set_tensor_data(tensor_t tensor, const void* input_data, int data_size);
+DLLEXPORT int set_tensor_data(tensor_t tensor, const void *input_data,
+                              int data_size);
 
 /*!
  * @brief Get the data type of the tensor.
@@ -937,7 +971,8 @@ DLLEXPORT int set_tensor_layout(tensor_t tensor, int layout);
  *
  * @return 0 on sucess, -1 on error.
  */
-DLLEXPORT int set_tensor_quant_param(tensor_t tensor, const float* scale, const int* zero_point, int number);
+DLLEXPORT int set_tensor_quant_param(tensor_t tensor, const float *scale,
+                                     const int *zero_point, int number);
 
 /*!
  * @brief Get tensor quant parameters.
@@ -949,13 +984,14 @@ DLLEXPORT int set_tensor_quant_param(tensor_t tensor, const float* scale, const 
  *
  * @return 0 on sucess, -1 on error.
  */
-DLLEXPORT int get_tensor_quant_param(tensor_t tensor, float* scale, int* zero_point, int number);
+DLLEXPORT int get_tensor_quant_param(tensor_t tensor, float *scale,
+                                     int *zero_point, int number);
 
 /************************** Graph run related interface *********************/
 
 /*!
- * @brief The interface to get possible cpu mask bits, when specified cluster of cpu,
- *        function will return the mask bits of the cluster.
+ * @brief The interface to get possible cpu mask bits, when specified cluster of
+ * cpu, function will return the mask bits of the cluster.
  *
  * @param [in] cluster: The be queried cluster.
  *
@@ -972,7 +1008,8 @@ DLLEXPORT size_t get_cluster_affinity_mask(int cluster);
  *
  * @return 0: Success, -1: Fail.
  */
-DLLEXPORT DEPRECATED_BEFORE int set_graph_thread(graph_t graph, int cluster, int threads) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int set_graph_thread(graph_t graph, int cluster,
+                                                 int threads) DEPRECATED_AFTER;
 
 /*!
  * @brief The interface to directly set used cpu mask.
@@ -982,7 +1019,8 @@ DLLEXPORT DEPRECATED_BEFORE int set_graph_thread(graph_t graph, int cluster, int
  *
  * @return 0: Success, -1: Fail.
  */
-DLLEXPORT DEPRECATED_BEFORE int set_graph_thread_mask(graph_t graph, size_t cpu_mask) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+set_graph_thread_mask(graph_t graph, size_t cpu_mask) DEPRECATED_AFTER;
 
 /*!
  * @brief The interface to set some proprietary attribute items for graph.
@@ -995,7 +1033,10 @@ DLLEXPORT DEPRECATED_BEFORE int set_graph_thread_mask(graph_t graph, size_t cpu_
  *
  * @return 0: Success, -1: Fail.
  */
-DLLEXPORT DEPRECATED_BEFORE int set_graph_attr(graph_t graph, const char* attr_name, const void* buf, int size) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int set_graph_attr(graph_t graph,
+                                               const char *attr_name,
+                                               const void *buf,
+                                               int size) DEPRECATED_AFTER;
 
 /*!
  * @brief The interface to get some proprietary config items for graph.
@@ -1008,10 +1049,13 @@ DLLEXPORT DEPRECATED_BEFORE int set_graph_attr(graph_t graph, const char* attr_n
  * @return 0: Success, -1: Fail.
  *
  */
-DLLEXPORT DEPRECATED_BEFORE int get_graph_attr(graph_t graph, const char* attr_name, void* buf, int size) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int get_graph_attr(graph_t graph,
+                                               const char *attr_name, void *buf,
+                                               int size) DEPRECATED_AFTER;
 
 /*!
- * @brief Initialize resource for graph execution, and set cluster and threads count will used.
+ * @brief Initialize resource for graph execution, and set cluster and threads
+ * count will used.
  *
  * @param [in] graph: The graph handle.
  * @param [in] cluster: The wanted cluster of all cpu clusters.
@@ -1038,7 +1082,8 @@ DLLEXPORT int prerun_graph(graph_t graph);
  * @param [in] graph: The graph handle.
  * @param [in] block: Blocking or nonlocking.
  * @return 0: Success, -1: Fail.
- * @note  If block is 0, need to call wait_graph to get result or set GRAPH_DONE event hook.
+ * @note  If block is 0, need to call wait_graph to get result or set GRAPH_DONE
+ * event hook.
  *
  */
 DLLEXPORT int run_graph(graph_t graph, int block);
@@ -1069,7 +1114,8 @@ DLLEXPORT int postrun_graph(graph_t graph);
  *
  * @return status
  */
-DLLEXPORT DEPRECATED_BEFORE int get_graph_exec_status(graph_t graph) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+get_graph_exec_status(graph_t graph) DEPRECATED_AFTER;
 
 /*!
  * @brief Set the event hook for graph execution.
@@ -1081,7 +1127,9 @@ DLLEXPORT DEPRECATED_BEFORE int get_graph_exec_status(graph_t graph) DEPRECATED_
  * @return 0: Success, -1: Fail.
  *
  */
-DLLEXPORT DEPRECATED_BEFORE int set_graph_event_hook(graph_t graph, int event, event_handler_t cb_func, void* cb_arg) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+set_graph_event_hook(graph_t graph, int event, event_handler_t cb_func,
+                     void *cb_arg) DEPRECATED_AFTER;
 
 /***************** Device related *****************************/
 
@@ -1092,7 +1140,8 @@ DLLEXPORT DEPRECATED_BEFORE int set_graph_event_hook(graph_t graph, int event, e
  * @return 0: valid, -1: invalid.
  *
  */
-DLLEXPORT DEPRECATED_BEFORE int set_default_device(const char* device) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+set_default_device(const char *device) DEPRECATED_AFTER;
 
 /*!
  * @brief Set the device to execution a graph.
@@ -1104,7 +1153,7 @@ DLLEXPORT DEPRECATED_BEFORE int set_default_device(const char* device) DEPRECATE
  *          <0: error.
  *
  */
-DLLEXPORT int set_graph_device(graph_t graph, const char* dev_name);
+DLLEXPORT int set_graph_device(graph_t graph, const char *dev_name);
 
 /*!
  * @brief get the device the node runs on
@@ -1113,15 +1162,15 @@ DLLEXPORT int set_graph_device(graph_t graph, const char* dev_name);
  *
  * @return the device name or NULL if no device assigned yet
  */
-DLLEXPORT DEPRECATED_BEFORE const char* get_node_device(node_t node) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE const char *
+get_node_device(node_t node) DEPRECATED_AFTER;
 
 /*!
  * @brief Get the default name of device.
  *
  * @return The name of the default device.
  */
-DLLEXPORT const char* get_default_device(void);
-
+DLLEXPORT const char *get_default_device(void);
 
 /******************** execution context *****************************/
 
@@ -1130,12 +1179,13 @@ DLLEXPORT const char* get_default_device(void);
  *
  * @param [in] context_name: The name of the created context.
  * @param [in] empty_context: No device is assigned with this context
- *                            otherwise, all proved devices will be added into the context.
+ *                            otherwise, all proved devices will be added into
+ * the context.
  *
  * @return Execution context handle.
  *         If create Failed, return NULL.
  */
-DLLEXPORT context_t create_context(const char* context_name, int empty_context);
+DLLEXPORT context_t create_context(const char *context_name, int empty_context);
 
 /*!
  * @brief Destory and reclaim the resource related with the context.
@@ -1151,7 +1201,8 @@ DLLEXPORT void destroy_context(context_t context);
  *
  * @return The number of devices inside the context.
  */
-DLLEXPORT DEPRECATED_BEFORE int get_context_device_number(context_t context) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+get_context_device_number(context_t context) DEPRECATED_AFTER;
 
 /*!
  *  @brief Add a device into one context.
@@ -1164,7 +1215,8 @@ DLLEXPORT DEPRECATED_BEFORE int get_context_device_number(context_t context) DEP
  *
  *  @return 0: Success, -1: Fail.
  */
-DLLEXPORT DEPRECATED_BEFORE int add_context_device(context_t context, const char* dev_name) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+add_context_device(context_t context, const char *dev_name) DEPRECATED_AFTER;
 
 /*!
  *  @brief Set device for one context.
@@ -1177,7 +1229,8 @@ DLLEXPORT DEPRECATED_BEFORE int add_context_device(context_t context, const char
  *
  *  @return 0: Success, -1: Fail.
  */
-DLLEXPORT int set_context_device(context_t context, const char* dev_name, const void* dev_option, size_t dev_opt_size);
+DLLEXPORT int set_context_device(context_t context, const char *dev_name,
+                                 const void *dev_option, size_t dev_opt_size);
 
 /*!
  *  @brief Remove a device from one context.
@@ -1187,7 +1240,8 @@ DLLEXPORT int set_context_device(context_t context, const char* dev_name, const 
  *
  *  @return 0: Success, -1: Fail.
  */
-DLLEXPORT DEPRECATED_BEFORE int remove_context_device(context_t context, const char* dev_name) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int
+remove_context_device(context_t context, const char *dev_name) DEPRECATED_AFTER;
 
 /*!
  * @brief Set attribute item of a context.
@@ -1198,7 +1252,10 @@ DLLEXPORT DEPRECATED_BEFORE int remove_context_device(context_t context, const c
  * @param [in] size: The buffer size.
  * @return 0: Success, -1: Fail.
  */
-DLLEXPORT DEPRECATED_BEFORE int set_context_attr(context_t context, const char* attr_name, const void* val, int val_size) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int set_context_attr(context_t context,
+                                                 const char *attr_name,
+                                                 const void *val,
+                                                 int val_size) DEPRECATED_AFTER;
 
 /*!
  * @brief Get the attribute item of a context.
@@ -1209,7 +1266,10 @@ DLLEXPORT DEPRECATED_BEFORE int set_context_attr(context_t context, const char* 
  * @param [in] size: The buffer size.
  * @return 0: Succuess, -1: Fail.
  */
-DLLEXPORT DEPRECATED_BEFORE int get_context_attr(context_t context, const char* attr_name, void* val, int val_size) DEPRECATED_AFTER;
+DLLEXPORT DEPRECATED_BEFORE int get_context_attr(context_t context,
+                                                 const char *attr_name,
+                                                 void *val,
+                                                 int val_size) DEPRECATED_AFTER;
 
 /*
  * Misc API
@@ -1257,7 +1317,8 @@ DLLEXPORT void set_log_output(log_print_t func);
 
 /*!
  * @brief Dump the run-time graph.
- *        If the graph is dumpped after prerun(), it will dump the optimized graph instead of the origin one.
+ *        If the graph is dumpped after prerun(), it will dump the optimized
+ * graph instead of the origin one.
  *
  * @param [in] graph: The graph handle.
  */
@@ -1274,7 +1335,9 @@ DLLEXPORT void dump_graph(graph_t graph);
  * @return 0: Plugin loaded and inited Success,
  *      -1: Fail
  */
-DLLEXPORT int load_tengine_plugin(const char* plugin_name, const char* file_name, const char* init_func_name);
+DLLEXPORT int load_tengine_plugin(const char *plugin_name,
+                                  const char *file_name,
+                                  const char *init_func_name);
 
 /*!
  * @brief Unload one plugin and call the release function.
@@ -1285,7 +1348,8 @@ DLLEXPORT int load_tengine_plugin(const char* plugin_name, const char* file_name
  * @return  0: Success;
  *      -1: Fail.
  */
-DLLEXPORT int unload_tengine_plugin(const char* plugin_name, const char* rel_func_name);
+DLLEXPORT int unload_tengine_plugin(const char *plugin_name,
+                                    const char *rel_func_name);
 
 /*!
  * @brief Get the number of loaded plugin.
@@ -1301,9 +1365,9 @@ DLLEXPORT int get_tengine_plugin_number(void);
  *
  * @return The name of plugin.
  */
-DLLEXPORT const char* get_tengine_plugin_name(int idx);
+DLLEXPORT const char *get_tengine_plugin_name(int idx);
 
-DLLEXPORT const char* get_tengine_hcl_version(void);
+DLLEXPORT const char *get_tengine_hcl_version(void);
 
 #ifdef __cplusplus
 }
