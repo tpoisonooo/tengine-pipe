@@ -27,6 +27,56 @@ private:
 };
 
 template <typename T>
+class InstantEdge final: public BaseEdge {
+public:
+    InstantEdge() = delete;
+
+    InstantEdge(size_t cap) {
+        assert(cap > 0);
+        m_cap = cap;
+    }
+
+    bool try_push(const T& val) {
+        std::lock_guard<std::mutex> _(m_mtx);
+        if (m_queue.size() >= m_cap) {
+            return false;
+        }
+        while(not m_queue.empty()) {
+            m_queue.pop();
+        }
+        m_queue.push(val);
+        return true;
+    }
+    
+    bool try_push(T&& val) {
+        std::lock_guard<std::mutex> _(m_mtx);
+        if (m_queue.size() >= m_cap) {
+            return false;
+        }
+        while(not m_queue.empty()) {
+            m_queue.pop();
+        }
+        m_queue.push(std::move(val));
+        return true;
+    }
+
+    bool pop(T& val) {
+        std::lock_guard<std::mutex> _(m_mtx);
+        if (m_queue.empty()) {
+            return false;
+        }
+        val = m_queue.front();
+        m_queue.pop();
+        return true;
+    }
+
+private:
+    std::queue<T> m_queue;
+    size_t  m_cap = 0;
+    std::mutex m_mtx;
+};
+
+template <typename T>
 class FIFOEdge final: public BaseEdge {
 public:
     FIFOEdge() = delete;

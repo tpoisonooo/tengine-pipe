@@ -10,7 +10,7 @@ template <typename... Args>
 class Param {
 public:
     using DataTypes = std::tuple<Args...>;
-    using EdgePtrTypes = std::tuple<FIFOEdge<Args>*...>;
+    using EdgePtrTypes = std::tuple<InstantEdge<Args>*...>;
 };
 
 class BaseNode {

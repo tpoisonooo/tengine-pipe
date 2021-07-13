@@ -35,7 +35,10 @@ public:
                 break;
             }
 
-            auto success = output<0>()->try_push(mat.clone());
+            
+            // auto success = output<0>()->try_push(mat.clone());
+            auto x = cv::imread("/home/konghuanjun/1576898570.jpg");
+            auto success = output<0>()->try_push(x);
             if (not success) {
                 fprintf(stdout, "abandon\n");
             }
