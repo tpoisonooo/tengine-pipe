@@ -185,7 +185,7 @@ public:
       rect.height = std::min(rect.height, mat.rows - rect.y - 1);
       cv::rectangle(mat, rect, cv::Scalar(255, 255, 255), 3);
     }
-    // output<0>()->try_push(std::move(mat));
+    output<0>()->try_push(std::move(mat));
   }
 
   ~PedestrianDetection() {
