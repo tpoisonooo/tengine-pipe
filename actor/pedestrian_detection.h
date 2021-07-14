@@ -28,6 +28,7 @@ public:
     m_graph = create_graph(NULL, "tengine", model_path.c_str());
     if (m_graph == nullptr) {
       fprintf(stderr, "create graph failed\n");
+      return;
     }
 
     /* set runtime options */
