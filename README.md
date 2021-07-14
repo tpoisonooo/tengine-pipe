@@ -12,14 +12,14 @@ $ cmake .. && make
 libtengine-lite.so 在 source/libtengine-lite.so，软链到 tengine-pipe
 
 $ cd tengine-pipe
-$ ls -s ${Tengine_BUILD}/source/libtengine-lite.so ./
+$ ln -s ${Tengine_BUILD}/source/libtengine-lite.so ./
 
 ### 下载模型
 
 按照 Tengine 的文档从云盘拉模型下来，目前只是需要 mobilenet_ssd.tmfile，软链过来
 
 $ cd tengine-pipe
-$ ls -s ${Models_DIR}/mobilenet_ssd.tmfile ./
+$ ln -s ${Models_DIR}/mobilenet_ssd.tmfile ./
 
 ### 编译运行
 
