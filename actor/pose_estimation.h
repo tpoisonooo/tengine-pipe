@@ -9,18 +9,9 @@
 
 namespace pipe {
 
-struct Box_t {
-  int x0;
-  int y0;
-  int x1;
-  int y1;
-  int class_idx;
-  float score;
-};
-
-class PedestrianDetection : public Node<Param<cv::Mat>, Param<cv::Mat>> {
+class PoseEstimation : public Node<Param<cv::Mat>, Param<cv::Mat>> {
 public:
-  PedestrianDetection(std::string model_path) {
+  PoseEstimation(std::string model_path) {
     /* inital tengine */
     init_tengine();
     fprintf(stderr, "tengine-lite library version: %s\n",
@@ -53,10 +44,16 @@ public:
       return;
     }
 
+    fprintf(stdout, "a graph success\n");
+
+
     if (set_tensor_shape(input_tensor, dims, 4) < 0) {
       fprintf(stderr, "Set input tensor shape failed\n");
       return;
     }
+
+
+    fprintf(stdout, "b graph success\n");
 
     if (set_tensor_buffer(input_tensor, m_input_data.get(), img_size * 4) < 0) {
       fprintf(stderr, "Set input tensor buffer failed\n");
@@ -70,53 +67,6 @@ public:
     }
   }
 
-  Box_t post_process_ssd(const cv::Mat &im, float threshold,
-                         const float *outdata, int num) {
-    const char *class_names[] = {
-        "background", "aeroplane",   "bicycle", "bird",  "boat",
-        "bottle",     "bus",         "car",     "cat",   "chair",
-        "cow",        "diningtable", "dog",     "horse", "motorbike",
-        "person",     "pottedplant", "sheep",   "sofa",  "train",
-        "tvmonitor"};
-
-    int raw_h = im.rows;
-    int raw_w = im.cols;
-
-    Box_t boxes[num] = {0};
-    int box_count = 0;
-
-    fprintf(stderr, "detect result num: %d \n", num);
-    for (int i = 0; i < num; i++) {
-      if (outdata[1] >= threshold) {
-        Box_t box;
-
-        box.class_idx = outdata[0];
-        box.score = outdata[1];
-        box.x0 = outdata[2] * raw_w;
-        box.y0 = outdata[3] * raw_h;
-        box.x1 = outdata[4] * raw_w;
-        box.y1 = outdata[5] * raw_h;
-
-        boxes[box_count] = box;
-        box_count++;
-
-        fprintf(stderr, "%s\t:%.1f%%\n", class_names[box.class_idx],
-                box.score * 100);
-        fprintf(stderr, "BOX:( %d , %d ),( %d , %d )\n", box.x0, box.y0, box.x1,
-                box.y1);
-      }
-      outdata += 6;
-    }
-
-    Box_t max = {0};
-    for (int i = 0; i < box_count; i++) {
-      if (boxes[i].score > max.score) {
-        max = boxes[i];
-      }
-    }
-
-    return max;
-  }
 
   void exec() override {
     cv::Mat mat;
@@ -136,7 +86,6 @@ public:
 
     cv::Mat input(img_h, img_w, CV_8UC3);
     cv::resize(mat, input, cv::Size(img_w, img_h));
-    cv::cvtColor(input, input, CV_BGR2RGB);
     input.convertTo(input, CV_32FC3);
 
     float *img_data = (float *)input.data;
@@ -171,25 +120,16 @@ public:
     /* postprocess*/
     fprintf(stdout, "out shape [%d %d %d %d]\n", out_dim[0], out_dim[1],
             out_dim[2], out_dim[3]);
-    auto result =
-        post_process_ssd(mat, show_threshold, output_data, out_dim[1]);
 
     auto time4 = get_current_time();
 
     fprintf(stdout, "preproc %.2f,  inference %.2f,  postproc %.2f \n",
             time2 - time1, time3 - time2, time4 - time3);
 
-    if (result.score > show_threshold) {
-      cv::Rect rect(std::max(0, result.x0), std::max(0, result.y0),
-                    result.x1 - result.x0, result.y1 - result.y0);
-      rect.width = std::min(rect.width, mat.cols - rect.x - 1);
-      rect.height = std::min(rect.height, mat.rows - rect.y - 1);
-      cv::rectangle(mat, rect, cv::Scalar(255, 255, 255), 3);
-    }
     output<0>()->try_push(std::move(mat));
   }
 
-  ~PedestrianDetection() {
+  ~PoseEstimation() {
     /* release tengine */
     postrun_graph(m_graph);
     destroy_graph(m_graph);
@@ -200,8 +140,8 @@ private:
   graph_t m_graph;
   std::unique_ptr<float> m_input_data;
 
-  int img_h = 300;
-  int img_w = 300;
+  int img_h = 192;
+  int img_w = 192;
   float mean[3] = {127.5f, 127.5f, 127.5f};
   float scale[3] = {0.007843f, 0.007843f, 0.007843f};
   float show_threshold = 0.5f;
