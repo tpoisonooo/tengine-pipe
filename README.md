@@ -12,7 +12,7 @@ $ cmake .. && make
 libtengine-lite.so 在 source/libtengine-lite.so，软链到 tengine-pipe
 
 $ cd tengine-pipe
-$ ls -s ${Tengine_BUILD}/source/libtengine-lite.so ./
+$ ln -s ${Tengine_BUILD}/source/libtengine-lite.so ./
 
 ### 下载模型
 
